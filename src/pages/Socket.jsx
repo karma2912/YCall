@@ -8,10 +8,7 @@ export const useSocket =()=>{
 }
 export const SocketProvider =(props)=>{
     const socket = useMemo(()=>
-         io('https://ycall-backend.onrender.com', {
-            transports: ['polling', 'websocket'], // Ensure both transports are available
-            withCredentials: true // Optional, based on your needs
-          })
+         io('https://ycall-backend.onrender.com')
     ,[])
    return(
     <SocketContext.Provider value={{socket}}>

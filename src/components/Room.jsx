@@ -15,9 +15,7 @@ const Room = () => {
  
   const handleIncomingCall = useCallback(async (data) => {
     const { fromEmail, offer } = data;
-    console.log("Incoming Call from", fromEmail, offer);
     const ans = await createAnswer(offer)
-    console.log("from handleIncomingCall ",ans)
     socket.emit("call-acceptedd",{fromEmail,ans})
   }, []);
    

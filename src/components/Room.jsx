@@ -4,7 +4,7 @@ import { usePeer } from "../pages/Peer";
 import ReactPlayer from "react-player";
 const Room = () => {
   const { socket } = useSocket();
-  const { peer, createOffer,createAnswer,setAnswer } = usePeer();
+  const { peer, createOffer,createAnswer,setAnswer,sendStream,remoteStream } = usePeer();
   const [myStream,setMyStream] = useState()
   const handleUserjoin = useCallback(async (data) => {
     const { emailId } = data;
@@ -31,7 +31,7 @@ const Room = () => {
   })
   useEffect(()=>{
    getUserMediaStream()
-  },[])
+  },[getUserMediaStream])
   useEffect(() => {
     socket.on("user-joined", handleUserjoin);
     socket.on("incoming-call", handleIncomingCall);
@@ -43,9 +43,11 @@ const Room = () => {
     }
   }, [socket]);
   return (
-    <div className="h-[100vh] w-[100vw] flex justify-center items-center bg-slate-400">
+    <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400">
       You Entered In Room
-      <ReactPlayer url={myStream} playing></ReactPlayer>
+     <button onClick={e=> sendStream(myStream)}>Send My Video</button>
+      <ReactPlayer url={myStream} playing muted></ReactPlayer>
+      <ReactPlayer url={remoteStream} playing></ReactPlayer>
     </div>
   );
 };

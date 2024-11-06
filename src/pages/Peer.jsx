@@ -7,7 +7,7 @@ export const usePeer =() => React.useContext(PeerContext)
 
 export const PeerProvider = (props) =>{
     const [remoteStream,setRemoteStream] = useState()
-
+   const [remoteTrack,setRemoteTrack] = useState()
     const peer = useMemo(()=> new RTCPeerConnection(),[])
 
     const createOffer= async ()=>{
@@ -27,17 +27,27 @@ export const PeerProvider = (props) =>{
     const sendStream = async(stream)=>{
       const tracks = stream.getTracks()
       for(const track of tracks){
-        peer.addTrack(track,stream)
+        console.log(track)
+       console.log("peer addtrack",peer.addTrack(track,stream))
+       setRemoteTrack(track)
       }
     }
 
     const handleTrackEvent = useCallback((ev)=>{
-        const streams = ev.streams()
+      console.log("inside track function")
+        const streams = ev.streams
+        console.log("these are streams under handletrackevent",streams)
         setRemoteStream(streams[0])
-    })
+    },[])
+ 
 
    useEffect(()=>{
-    peer.addEventListener('track',handleTrackEvent)})
+    peer.addEventListener('track',handleTrackEvent)
+    console.log("inside handletrack useeffect")
+    return()=>{
+      peer.removeEventListener('track',handleTrackEvent)
+    }
+  },[remoteTrack])
 
     const setAnswer = async(ans)=>{
         await peer.setRemoteDescription(ans)

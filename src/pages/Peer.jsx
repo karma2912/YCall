@@ -1,14 +1,22 @@
-
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { useSocket } from "../pages/Socket";
 
 const PeerContext = React.createContext()
 
 export const usePeer =() => React.useContext(PeerContext)
 
 export const PeerProvider = (props) =>{
+  const { socket } = useSocket();
     const [remoteStream,setRemoteStream] = useState()
    const [remoteTrack,setRemoteTrack] = useState()
-    const peer = useMemo(()=> new RTCPeerConnection(),[])
+   const peer = new RTCPeerConnection({
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+  });
+
+    console.log("Peer connection state:", peer.connectionState);
+    console.log("Peer ice connection state:", peer.iceConnectionState);
+   
+ 
 
     const createOffer= async ()=>{
         const offer = await peer.createOffer()
@@ -17,9 +25,10 @@ export const PeerProvider = (props) =>{
     }
 
     const createAnswer = async(offer)=>{
-        console.log(offer)
+        console.log("This offer is received",offer)
         await peer.setRemoteDescription(offer)
         const answer = await peer.createAnswer()
+        console.log("This is the answer which is sent",answer)
         await peer.setLocalDescription(answer)
         return answer
     }
@@ -27,23 +36,23 @@ export const PeerProvider = (props) =>{
     const sendStream = async(stream)=>{
       const tracks = stream.getTracks()
       for(const track of tracks){
-        console.log(track)
-       console.log("peer addtrack",peer.addTrack(track,stream))
+       peer.addTrack(track,stream)
+       console.log("this is track",track)
        setRemoteTrack(track)
       }
     }
 
     const handleTrackEvent = useCallback((ev)=>{
-      console.log("inside track function")
         const streams = ev.streams
-        console.log("these are streams under handletrackevent",streams)
         setRemoteStream(streams[0])
     },[])
- 
+
+    const handleIncomingCandidate =(candidate)=>{
+     
+    }
 
    useEffect(()=>{
     peer.addEventListener('track',handleTrackEvent)
-    console.log("inside handletrack useeffect")
     return()=>{
       peer.removeEventListener('track',handleTrackEvent)
     }
@@ -52,6 +61,8 @@ export const PeerProvider = (props) =>{
     const setAnswer = async(ans)=>{
         await peer.setRemoteDescription(ans)
     }
+
+
  return (
     <PeerContext.Provider value={{peer,createOffer,createAnswer,setAnswer,sendStream,remoteStream}}>
      {props.children}

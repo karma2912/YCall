@@ -16,16 +16,36 @@ export const PeerProvider = (props) =>{
     console.log("Peer connection state:", peer.connectionState);
     console.log("Peer ice connection state:", peer.iceConnectionState);
    
- 
+    peer.oniceconnectionstatechange = () => {
+      console.log("ICE Connection State:", peer.iceConnectionState);
+    };
+     
+    peer.onicecandidate = (event) => {
+      if (event.candidate) {
+        console.log("New ICE Candidate:", event.candidate);
+        socket.emit("ice-candidate", event.candidate);
+      }
+    };
+   
+    const handleIceCandidate =(data)=>{
+      console.log("inside handleicecandidateeeeeeeeeeeeeeeeeeeeeeeee",data)
+      
+        peer.addIceCandidate(new RTCIceCandidate(data));  // Add received candidate
+
+    }
+    socket.on('ice-candidate',handleIceCandidate)
 
     const createOffer= async ()=>{
         const offer = await peer.createOffer()
         await peer.setLocalDescription(offer)
         return offer
     }
-
+    
+    const handleIncomingPeer =()=>{
+      console.log("incoming peer from handlincomingpeer function")
+    }
     const createAnswer = async(offer)=>{
-        console.log("This offer is received",offer)
+       console.log("This offer is received",offer)
         await peer.setRemoteDescription(offer)
         const answer = await peer.createAnswer()
         console.log("This is the answer which is sent",answer)
@@ -42,29 +62,22 @@ export const PeerProvider = (props) =>{
       }
     }
 
-    const handleTrackEvent = useCallback((ev)=>{
-        const streams = ev.streams
-        setRemoteStream(streams[0])
-    },[])
 
-    const handleIncomingCandidate =(candidate)=>{
-     
-    }
-
-   useEffect(()=>{
-    peer.addEventListener('track',handleTrackEvent)
-    return()=>{
-      peer.removeEventListener('track',handleTrackEvent)
-    }
-  },[remoteTrack])
+    peer.ontrack = (event) => {
+      console.log("Received remote track", event);
+      // Ensure the remote stream is correctly set in state
+      const remoteStream = event.streams;
+      setRemoteStream(remoteStream[0]);  // Store it in state for rendering
+    };
 
     const setAnswer = async(ans)=>{
-        await peer.setRemoteDescription(ans)
+      console.log("this is the answer which is been set to remote description",ans)
+      await peer.setRemoteDescription(ans)
     }
-
+    
 
  return (
-    <PeerContext.Provider value={{peer,createOffer,createAnswer,setAnswer,sendStream,remoteStream}}>
+    <PeerContext.Provider value={{peer,createOffer,createAnswer,setAnswer,sendStream,remoteStream,handleIncomingPeer}}>
      {props.children}
    </PeerContext.Provider>
    )}

@@ -4,56 +4,29 @@ import { usePeer } from "../pages/Peer";
 import ReactPlayer from "react-player";
 const Room = () => {
   const { socket } = useSocket();
-  const { peer, createOffer,createAnswer,setAnswer,sendStream,remoteStream ,handleIceCandidate} = usePeer();
+  const { peer, createOffer,createAnswer,setAnswer,sendStream,remoteStream ,handleIncomingPeer} = usePeer();
   const [offerr,setOfferr] = useState("")
   const [myStream,setMyStream] = useState()
   const [remoteEmail,setRemoteEmail] = useState()
   const offerRef = useRef(offerr)
 
-
+console.log("this is remote stream",remoteStream)
   const handleUserjoin = useCallback(async (data) => {
     const { emailId } = data;
     const offer = await createOffer();
     console.log("This is offer ",offer)
     setOfferr(offer)
     socket.emit("call-user", { emailId, offer });
-
-    peer.onicecandidate = (event) => {
-      if (event.candidate) {
-        console.log("New ICE Candidate:", event.candidate);
-        socket.emit("send-ice-candidate", event.candidate)
-      }
-      else{
-        console.log("Didn't get ICE Candidates")
-      }
-    };
-    socket.on("receive-ice-candidate",(data)=>{
-      const {candidate} = data
-      console.log("these are received candidates",candidate)
-    })
     setRemoteEmail(emailId)
   }, []);
  
   const handleIncomingCall = useCallback(async (data) => {
-    const { fromEmail, offer } = data;
+
+    const { fromEmail, offer } = data; 
     const ans = await createAnswer(offer)
-    peer.onicecandidate = (event) => {
-      if (event.candidate) {
-        console.log("New ICE Candidate:", event.candidate);
-        socket.emit("peer2-candidate",event.candidate)
-      }
-      else{
-        console.log("Didn't get ICE Candidates")
-      }
-    };
-    handle
     socket.emit("call-acceptedd",{fromEmail,ans})
     setRemoteEmail(fromEmail)
   }, []);
-   
-  peer.oniceconnectionstatechange = () => {
-    console.log("ICE Connection State:", peerConnection.iceConnectionState);
-  };
 
   const handleCallAccepted = useCallback(async(data)=>{
     const {ans} = data
@@ -75,8 +48,11 @@ const Room = () => {
    console.log("this is remote stream",remoteStream)
   },[])
 
+  socket.on("receive-ice-candidate",(data)=>{
+    const {candidate} = data
+    console.log("These are the recieved Candidates",candidate)
+  })
 
-  
   useEffect(()=>{
    offerRef.current = offerr
   },[offerr])
@@ -103,13 +79,16 @@ const Room = () => {
     }
   }, [socket]);
   return (
-    <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400">
-      You Entered In Room
-      <div>A new user has joined {remoteEmail}</div>
-     <button onClick={()=>sendStream(myStream)} className="border-2 border-black p-2 bg-blue-400 text-white">Send My Video</button>
-      <ReactPlayer url={myStream} playing muted></ReactPlayer>
-      this is remote stream
-      <ReactPlayer url={remoteStream} playing></ReactPlayer>
+    <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400 ">
+      <p className="h-1/4  w-full flex justify-center items-center"> You Entered In Room</p>
+      <div className="h-full w-full flex justify-center items-start">
+        <div>
+      <p className="text-center pb-5">This is main user</p><ReactPlayer url={myStream} playing muted></ReactPlayer>
+      </div>
+      <div> 
+      <p className="text-center pb-5">This is New user</p><ReactPlayer url={remoteStream} playing muted></ReactPlayer>
+      </div>
+      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ export const usePeer =() => React.useContext(PeerContext)
 
 export const PeerProvider = (props) =>{
   const { socket } = useSocket();
+  
     const [remoteStream,setRemoteStream] = useState()
    const [remoteTrack,setRemoteTrack] = useState()
    const peer = new RTCPeerConnection({
@@ -28,12 +29,16 @@ export const PeerProvider = (props) =>{
     };
    
     const handleIceCandidate =(data)=>{
-      console.log("inside handleicecandidateeeeeeeeeeeeeeeeeeeeeeeee",data)
-      
+      console.log("I am adding the candidates through addIceCandidate...........")
         peer.addIceCandidate(new RTCIceCandidate(data));  // Add received candidate
 
     }
-    socket.on('ice-candidate',handleIceCandidate)
+    useEffect(()=>{
+      socket.on('ice-candidate',handleIceCandidate)
+      return()=>{
+        socket.off('ice-candidate',handleIceCandidate)
+      }
+    },[socket])
 
     const createOffer= async ()=>{
         const offer = await peer.createOffer()
@@ -50,6 +55,7 @@ export const PeerProvider = (props) =>{
         const answer = await peer.createAnswer()
         console.log("This is the answer which is sent",answer)
         await peer.setLocalDescription(answer)
+
         return answer
     }
 

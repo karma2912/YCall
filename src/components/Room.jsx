@@ -40,7 +40,9 @@ console.log("this is remote stream",remoteStream)
   },[]) 
 
   const getUserMediaStream=useCallback(async()=>{
+    console.log("byeeeeeeeeeeeeeeeeee")
    const stream = await navigator.mediaDevices.getUserMedia({video:true})
+   console.log("this is my streammmm",stream)
    console.log("function after get user media")
    sendStream(stream)
    setMyStream(stream)
@@ -48,10 +50,6 @@ console.log("this is remote stream",remoteStream)
    console.log("this is remote stream",remoteStream)
   },[])
 
-  socket.on("receive-ice-candidate",(data)=>{
-    const {candidate} = data
-    console.log("These are the recieved Candidates",candidate)
-  })
 
   useEffect(()=>{
    offerRef.current = offerr
@@ -65,7 +63,7 @@ console.log("this is remote stream",remoteStream)
 
   useEffect(()=>{
    getUserMediaStream()
-   
+   console.log("hoooooooooooo",myStream)
   },[getUserMediaStream])
   useEffect(() => {
     socket.on("user-joined", handleUserjoin);
@@ -81,7 +79,7 @@ console.log("this is remote stream",remoteStream)
   return (
     <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400 ">
       <p className="h-1/4  w-full flex justify-center items-center"> You Entered In Room</p>
-      <div className="h-full w-full flex justify-center items-start">
+      <div className="h-full w-full flex md:flex-row flex-col justify-center items-start">
         <div>
       <p className="text-center pb-5">This is main user</p><ReactPlayer url={myStream} playing muted></ReactPlayer>
       </div>

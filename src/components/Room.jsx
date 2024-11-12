@@ -84,7 +84,7 @@ console.log("this is remote stream",remoteStream)
       <p className="text-center pb-5">This is main user</p><ReactPlayer url={myStream} playing muted></ReactPlayer>
       </div>
       <div> 
-      <p className="text-center pb-5">This is New user</p><ReactPlayer url={remoteStream} playing muted></ReactPlayer>
+      <p className="text-center pb-5">{`{This is ${remoteEmail} }`}</p><ReactPlayer url={remoteStream} playing muted></ReactPlayer>
       </div>
       </div>
     </div>

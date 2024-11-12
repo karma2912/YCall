@@ -24,7 +24,7 @@ console.log("this is remote stream",remoteStream)
 
     const { fromEmail, offer } = data; 
     const ans = await createAnswer(offer)
-    socket.emit("call-acceptedd",{fromEmail,ans})
+    socket.emit("call-accepted",{fromEmail,ans})
     setRemoteEmail(fromEmail)
   }, []);
 
@@ -77,7 +77,7 @@ console.log("this is remote stream",remoteStream)
     }
   }, [socket]);
   return (
-    <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400 ">
+    <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400 overflow-x-hidden">
       <p className="h-1/4  w-full flex justify-center items-center"> You Entered In Room</p>
       <div className="h-full w-full flex md:flex-row flex-col justify-center items-start">
         <div>

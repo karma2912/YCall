@@ -80,10 +80,10 @@ console.log("this is remote stream",remoteStream)
     <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-slate-400 overflow-x-hidden">
       <p className="h-1/4  w-full flex justify-center items-center"> You Entered In Room</p>
       <div className="h-full w-full flex md:flex-row flex-col justify-center items-start">
-        <div>
+        <div className="h-full w-full flex flex-col justify-center items-center">
       <p className="text-center pb-5">This is main user</p><ReactPlayer url={myStream} playing muted></ReactPlayer>
       </div>
-      <div> 
+      <div className="h-full w-full flex flex-col justify-center items-center"> 
       <p className="text-center pb-5">{`{This is ${remoteEmail} }`}</p><ReactPlayer url={remoteStream} playing muted></ReactPlayer>
       </div>
       </div>

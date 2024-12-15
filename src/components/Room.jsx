@@ -63,7 +63,7 @@ console.log("this is remote stream",remoteStream)
 
   useEffect(()=>{
    getUserMediaStream()
-   console.log("hoooooooooooo",myStream)
+   console.log("hooooooooooooo",myStream)
   },[getUserMediaStream])
   useEffect(() => {
     socket.on("user-joined", handleUserjoin);

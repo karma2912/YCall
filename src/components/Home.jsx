@@ -6,6 +6,7 @@ const Home = () => {
     const {socket} = useSocket()
     const navigate = useNavigate()
     useEffect(()=>{
+      console.log("This is socket",socket)
       socket.on('joined-room',(roomId)=>{
         navigate(`/room/${roomId}`)
       })
